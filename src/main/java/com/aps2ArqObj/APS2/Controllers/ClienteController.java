@@ -1,38 +1,53 @@
 package com.aps2ArqObj.APS2.Controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.aps2ArqObj.APS2.Models.Cliente;
+import com.aps2ArqObj.APS2.Security.Autenticado;
+import com.aps2ArqObj.APS2.Services.ClienteService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/clientes")
 public class ClienteController {
-    @Autowired
-    private ClienteRepository clienteRepo;
 
-    @PostMapping
-    @PreAuthorize("isAuthenticated()")
-    public Cliente criar(@RequestBody Cliente cliente) {
-        return clienteRepo.save(cliente);
+    private final ClienteService clienteService;
+
+    public ClienteController(ClienteService clienteService) {
+        this.clienteService = clienteService;
     }
+
+
+    @Autenticado
+    @PostMapping
+    public ResponseEntity<Cliente> cadastrar(@RequestBody Cliente cliente) {
+        return ResponseEntity.ok(clienteService.cadastrarCliente(cliente));
+    }
+
 
     @GetMapping
-    public List<Cliente> listar() {
-        return clienteRepo.findAll();
+    public ResponseEntity<List<Cliente>> listar() {
+        return ResponseEntity.ok(clienteService.listarClientes());
     }
+
 
     @GetMapping("/{cpf}")
-    public Cliente buscarPorCpf(@PathVariable String cpf) {
-        return clienteRepo.findByCpf(cpf).orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+    public ResponseEntity<Cliente> buscar(@PathVariable String cpf) {
+        return clienteService.buscarPorCpf(cpf)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
-    public Cliente editar(@PathVariable Long id, @RequestBody Cliente dados) {
-        Cliente c = clienteRepo.findById(id).orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
-        c.setNome(dados.getNome());
-        c.setEmail(dados.getEmail());
-        return clienteRepo.save(c);
+
+    @Autenticado
+    @PutMapping("/{cpf}")
+    public ResponseEntity<Cliente> editar(@PathVariable String cpf, @RequestBody Cliente atualizado) {
+        try {
+            Cliente clienteEditado = clienteService.editarCliente(cpf, atualizado);
+            return ResponseEntity.ok(clienteEditado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
-
