@@ -1,15 +1,31 @@
 package com.aps2ArqObj.APS2.Models;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "clientes")
 public class Cliente {
+
+    @Id
+    @Column(length = 14)
     private String cpf;
+
     private String nome;
+
     private LocalDate dataNascimento;
+
     private float salario;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "conta_numero", referencedColumnName = "numero")
     private ContaCorrente conta;
+
     private String email;
+
     private String senha;
+
+    public Cliente() {}
 
     public Cliente(String cpf, String nome, LocalDate dataNascimento, float salario, String email, String senha) {
         this.cpf = cpf;

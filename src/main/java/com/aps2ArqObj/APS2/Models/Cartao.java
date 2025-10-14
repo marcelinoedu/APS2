@@ -1,12 +1,27 @@
 package com.aps2ArqObj.APS2.Models;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "cartoes")
 public class Cartao {
+
+    @Id
+    @Column(name = "numero_cartao", length = 100)
     private String numeroCartao;
+
     private String tipo;
+
     private LocalDate validade;
+
     private String status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "conta_numero")
+    private ContaCorrente conta;
+
+    public Cartao() {}
 
     public Cartao(String numeroCartao, String tipo, LocalDate validade) {
         this.numeroCartao = numeroCartao;
@@ -26,6 +41,9 @@ public class Cartao {
 
     public String getStatus() { return status; }
     private void setStatus(String status) { this.status = status; }
+
+    public ContaCorrente getConta() { return conta; }
+    public void setConta(ContaCorrente conta) { this.conta = conta; }
 
     public boolean isExpired() {
         return validade.isBefore(LocalDate.now());
