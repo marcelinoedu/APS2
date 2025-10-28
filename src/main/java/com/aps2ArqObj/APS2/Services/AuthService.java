@@ -1,7 +1,10 @@
+// src/main/java/com/aps2ArqObj/APS2/Services/AuthService.java
 package com.aps2ArqObj.APS2.Services;
 
+import com.aps2ArqObj.APS2.DTO.TokenResponseDto;
+import com.aps2ArqObj.APS2.Services.TokenService;
 import com.aps2ArqObj.APS2.Models.Cliente;
-import com.aps2ArqObj.APS2.Models.Token;
+import com.aps2ArqObj.APS2.Services.ClienteService;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,12 +17,12 @@ public class AuthService {
         this.clienteService = clienteService;
     }
 
-
-    public Token login(String cpf, String senha) {
-        return clienteService.buscarPorCpf(cpf)
+    public TokenResponseDto login(String cpf, String senha) {
+        Cliente cliente = clienteService.buscarPorCpf(cpf)
                 .filter(c -> senha.equals(c.getSenha()))
-                .map(c -> new Token(tokenService.gerarToken(c.getCpf())))
                 .orElseThrow(() -> new RuntimeException("Credenciais inválidas"));
+
+        return tokenService.gerarTokenResponse(cliente.getCpf());
     }
 
     public boolean validar(String token) {

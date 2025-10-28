@@ -1,3 +1,4 @@
+// src/main/java/com/aps2ArqObj/APS2/Config/DataInitializer.java
 package com.aps2ArqObj.APS2.Config;
 
 import com.aps2ArqObj.APS2.Models.Cartao;
@@ -32,7 +33,6 @@ public class DataInitializer {
     public void init() {
         final String cpfAdmin = "12345678900";
 
-
         Optional<Cliente> existing = clienteService.buscarPorCpf(cpfAdmin);
         if (existing.isPresent()) {
             System.out.println("Cliente inicial já existe: CPF " + cpfAdmin);
@@ -40,10 +40,10 @@ public class DataInitializer {
         }
 
         ContaCorrente conta = new ContaCorrente(
-                "0001",      
-                "00000001",   
+                "0001",
+                "00000001",
                 1000.0f,
-                500.0f        
+                500.0f
         );
 
         Cliente cliente = new Cliente(
@@ -56,6 +56,7 @@ public class DataInitializer {
         );
         cliente.setConta(conta);
         clienteService.cadastrarCliente(cliente);
+
         Cartao cartao = new Cartao(
                 UUID.randomUUID().toString(),
                 "DEBITO",
